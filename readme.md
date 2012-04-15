@@ -1,4 +1,4 @@
-jqPivot, 
+**jqPivot**
 
 An advanced grid plugin for jQuery. Because I need one. 
 
