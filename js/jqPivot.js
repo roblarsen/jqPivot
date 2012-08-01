@@ -313,6 +313,8 @@
     function jqPivotScrollingViewport (){
         this._super.constructor.call(this);
         this.$innerTable = null;
+        this.$rootDiv = null;
+        this.currentLastRow = 0;
     }
     //Take care of the inheritance first
     jqPivotScrollingViewport.prototype = new JqPivotBaseViewport(null);
@@ -328,14 +330,28 @@
     */
     jqPivotScrollingViewport.prototype.createInnerTable = function (innerTableContainer) {
 
+        this.$rootDiv = $("<div />").css({ 
+                                            "overflow-y":"scroll",
+                                            "overflow-x":"hidden"
+                                        });
+
         this.$innerTable = $("<table />").addClass("jqPivotInnerTable")
-                                         .css({ 
-                                                "overflow-y":"scroll",
-                                                "overflow-x":"hidden"
-                                                })
                                          .append($("<tbody />"));
 
-       $(innerTableContainer).append(this.$innerTable);
+        this.$rootDiv.append(this.$innerTable);
+        $(innerTableContainer).append(this.$rootDiv);
+
+         this.$rootDiv.on("scroll", bind(this, function onScroll () {
+                var thumb = arguments[0].currentTarget,
+                    thumbPosition = thumb.scrollTop,
+                    topRowPos = Math.round(thumbPosition / this.rowHeight),
+                    gridRows = this.options.gridRows,
+                    bottomRowPos = topRowPos + gridRows;
+                
+                if (bottomRowPos >= this.currentLastRow) {
+                    this._raiseRequestDataCallback(bottomRowPos+1, bottomRowPos+1+this.currentGridData.length);
+                }
+        }));
     }
 
     
@@ -384,6 +400,7 @@
                 }
 
                 currentCellName = this._getColumnHeaderFromIndex(b).replace(/\s|\&nbsp;+/g, '');
+                // Add the generic CSS classes and the specific one for this current cell
                 $currentCell = $("<td />")
                                     .addClass(cellClasses)
                                     .attr("id",(a+1).toString()+"_"+(b+1).toString())
@@ -404,15 +421,12 @@
             }
         }
 
-        this.currentLastRow = cnt;
+        this.currentLastRow += cnt;
         if (gridRows > 0) {
-            this.$innerTable.height(this.rowHeight * gridRows);
+            this.$rootDiv.height((this.rowHeight * gridRows)+5);
         }
-
-        this.$innerTable.on("scroll", bind(this, function onScroll () {
-        }));
-
      }
+
     $.widget( PIVOT_NAMESPACE +".jqPivot" , {
         
         //Options to be used as defaults
