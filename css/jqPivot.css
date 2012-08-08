@@ -1,30 +1,71 @@
+/*
 body{
 	background-color: white;
 	text-align:center;
 	padding:55px;
 }
 
-
 .center{
 	text-align:left;
 }
+*/
+
+/* not extensible enuff, but keeps styling out of JS
+#cell_1_1, #cell_1_2, #cell_1_3, #cell_1_4, #cell_1_5, #cell_1_6{
+	border-top:0px;
+}
+*/
+
 
 .jqPivotTable, .jqPivotInnerTable{
 	width:100%;
 	max-width:1600px;
+	border-spacing:0;
 	border-collapse:collapse;
-	margin:0px;
+	margin:0;
+	padding:0;
 	position: relative;
 }
 
-.jqPivotTable th, .jqPivotInnerTable th, .jqPivotInnerTable td{
-    border: 1px solid black;
+.jqPivotTable th{
+	/*
+	border-top:1px solid black;
+	border-right:1px solid black;
+	border-bottom:1px solid black;
+	border-left:1px solid black;
+    padding:0;
+    margin:0;*/
+}
+.jqPivotTable td{
+	/*
+	margin:0px;
+	padding:0px;
+	border-spacing:0;
+	border-collapse:collapse;
+	border:0px;
+	border-left:1px solid black;
+	border-bottom:1px solid black;*/
+}
+
+.jqPivotInnerTable th, .jqPivotInnerTable td{
+   border-left:0px;
+    /*
+    border:0px;
+    border-top:1px solid black;
+	border-right:1px solid black;
+	border-bottom:1px solid black;
+    padding:0px;
+    margin:0px;
+    */
 }
 
 .jqPivotTable, .jqPivotInnerCell {
     border: 0px none;
+    margin:0px;
+    padding:0px;
 }
 
+/*
 .grip{
 	width:20px;
 	height:30px;
@@ -63,7 +104,8 @@ input.check{
 label{
 	color:#0361ae;
 }
-
+*/
+/*
 #scroller {
     right: 0px !important;
     width: 17px;
@@ -84,3 +126,4 @@ label{
     top: 0;
     width: 19px;
 }
+*/
