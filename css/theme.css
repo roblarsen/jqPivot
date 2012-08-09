@@ -1,13 +1,9 @@
-@font-face {
-    font-family: Anivers;
-    src: url(../fonts/Anivers_Regular.otf);
-}
 
 body{
 	background-color: white;
 	text-align: center;
 	padding: 55px;
-	font-family: Anivers, Helvetica, Arial, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 }
 
 /* think about naming here for these selectors? */
@@ -16,32 +12,107 @@ body{
 	padding:10px;
 	border:3px solid #ccc;
 	background: #fff;
-	background: -moz-linear-gradient(top,  #ffffff 0%, #f3f3f3 50%, #ededed 51%, #ffffff 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(50%,#f3f3f3), color-stop(51%,#ededed), color-stop(100%,#ffffff));
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
-	background: -o-linear-gradient(top,  #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
-	background: -ms-linear-gradient(top,  #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
-	background: linear-gradient(to bottom,  #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 );
+	background: -moz-linear-gradient (
+		top, 
+		#ffffff 0%,
+		#f3f3f3 50%, 
+		#ededed 51%, 
+		#ffffff 100%
+	);
+	background: -webkit-gradient (
+		linear, 
+		left top, 
+		left bottom, 
+		color-stop(0%,#ffffff), 
+		color-stop(50%,#f3f3f3), 
+		color-stop(51%,#ededed), 
+		color-stop(100%,#ffffff)
+	);
+	background: -webkit-linear-gradient(
+		top, 
+		#ffffff 0%,
+		#f3f3f3 50%,
+		#ededed 51%,
+		#ffffff 100%
+	);
+	background: -o-linear-gradient(
+		top,  
+		#ffffff 0%,
+		#f3f3f3 50%,
+		#ededed 51%,
+		#ffffff 100%
+	);
+	background: -ms-linear-gradient(
+		top,
+		#ffffff 0%,
+		#f3f3f3 50%,
+		#ededed 51%,
+		#ffffff 100%
+	);
+	background: linear-gradient(
+		to bottom,  
+		#ffffff 0%,
+		#f3f3f3 50%,
+		#ededed 51%,
+		#ffffff 100%
+	);
+	filter: progid:DXImageTransform.Microsoft.gradient( 
+		startColorstr='#ffffff', 
+		endColorstr='#ffffff',
+		GradientType=0
+	);
 }
+
 
 .jqPivotTable td {
 	border-left:3px solid #ccc;
 	border-bottom:3px solid #ccc;
+	padding:0px;
 }
 
-
 .jqPivotInnerTable td {
-	border:3px solid #fff;	
+	text-align:left;
+	border-collapse:separate;
+	border:3px solid #fff;
 	padding:10px;
 	background: #e9f6fd;
-	background: -moz-linear-gradient(top,  #e9f6fd 0%, #d3eefb 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e9f6fd), color-stop(100%,#d3eefb));
-	background: -webkit-linear-gradient(top,  #e9f6fd 0%,#d3eefb 100%);
-	background: -o-linear-gradient(top,  #e9f6fd 0%,#d3eefb 100%);
-	background: -ms-linear-gradient(top,  #e9f6fd 0%,#d3eefb 100%);
-	background: linear-gradient(to bottom,  #e9f6fd 0%,#d3eefb 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e9f6fd', endColorstr='#d3eefb',GradientType=0 );
+	background: -moz-linear-gradient(
+		top,  
+		#e9f6fd 0%, 
+		#d3eefb 100%
+	);
+	background: -webkit-gradient(
+		linear, 
+		left top, 
+		left bottom, 
+		color-stop(0%,#e9f6fd), 
+		color-stop(100%,#d3eefb)
+	);
+	background: -webkit-linear-gradient(
+		top,  
+		#e9f6fd 0%,
+		#d3eefb 100%
+	);
+	background: -o-linear-gradient(
+		top,  
+		#e9f6fd 0%,
+		#d3eefb 100%
+	);
+	background: -ms-linear-gradient(
+		top, 
+		#e9f6fd 0%,
+		#d3eefb 100%
+	);
+	background: linear-gradient(
+		to bottom,  
+		#e9f6fd 0%,
+		#d3eefb 100%
+	);
+	filter: progid:DXImageTransform.Microsoft.gradient(
+		startColorstr='#e9f6fd', 
+		endColorstr='#d3eefb',
+		GradientType=0
+	);
 }
 
 .jqPivotTooltip {
