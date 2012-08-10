@@ -400,7 +400,7 @@
                                     .append(data[a][b]);
                
                 if (a==0){
-                	$currentCell.css({"border-top":"0px none"})
+                	$currentCell.css({"border-top":"0px none"});
                 }
                 
                 $currentRow.append($currentCell);
@@ -557,7 +557,7 @@
                                     .append(data[a][b]);
                
                 if (a==0){
-                	$currentCell.css({"border-top":"0"})
+                	$currentCell.css({"border-top":"0"});
                 }
                 
                 if (currentCellName.length > 0){
