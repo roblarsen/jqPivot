@@ -53,6 +53,9 @@
     JqPivotBaseViewport.prototype._super = function () {};
     JqPivotBaseViewport.prototype.initialize = function (options) {
         this.options = options;
+        
+        //hide the toolTip, if it's in the page
+        $("#"+ this.options.toolTipDivID).css("display", "none")
     };
 
     /**
@@ -279,7 +282,6 @@
                                     "position":"absolute",
                                     "right":"0px",
                                     "top":"0px",
-                                    "border":"1px solid green",
                                     "display":"none"
                                     }),
             $fakeScrollerContent = $("<div />")
@@ -394,8 +396,13 @@
                 $currentCell = $("<td />")
                                     .addClass(cellClasses)
                                     .addClass("column"+currentCellName)
-                                    .attr("id",(a+1).toString()+"_"+(b+1).toString())
+                                    .attr("id", "cell_"+(a+1).toString()+"_"+(b+1).toString())
                                     .append(data[a][b]);
+               
+                if (a==0){
+                	$currentCell.css({"border-top":"0px none"})
+                }
+                
                 $currentRow.append($currentCell);
             }
                 
@@ -423,6 +430,7 @@
         this.$rootDiv = null;
         this.currentLastRow = 0;
         this.currentScrollbarSize = -1;
+        this.rootDivHasSize = false;
     };
 
     //Take care of the inheritance first
@@ -437,8 +445,9 @@
 
         var gridRows = this.options.gridRows;
         // Set the inner grid height if it is defined in the plugin options
-        if (gridRows > 0) {
-            this.$rootDiv.height((this.rowHeight * gridRows)+5);
+        if (gridRows > 0 && !this.rootDivHasSize) {
+        	this.$rootDiv.height((this.rowHeight * gridRows)+5); //rowhight increments by 1 strangely, then * gridRows
+        	this.rootDivHasSize = true
         }
 
         var overflowStatus,
@@ -471,7 +480,10 @@
 
         this.$rootDiv = $("<div />").css({ 
                                             "overflow-y":"hidden",
-                                            "overflow-x":"hidden"
+                                            "overflow-x":"hidden",
+                                            "margin":"0px",
+                                            "padding":"0px",
+                                            "border":"0px"                                            	
                                         });
 
         this.$innerTable = $("<table />").addClass("jqPivotInnerTable")
@@ -543,6 +555,10 @@
                                     .addClass(cellClasses)
                                     .attr("id",(a+1).toString()+"_"+(b+1).toString())
                                     .append(data[a][b]);
+               
+                if (a==0){
+                	$currentCell.css({"border-top":"0"})
+                }
                 
                 if (currentCellName.length > 0){
                     $currentCell.addClass("column"+currentCellName);
@@ -689,15 +705,16 @@
             var options = this.options,
                 viewport = options.viewport,
                 mainGridName = options.mainGridClassName,
-                dataObj = {options:options},
-                htmlData = "<table class=\""+mainGridName+"\" cellpadding=\"0\" cellspacing=\"0\"><TBody></TBody></table>",// ToDo: remove attributes: cellpadding & cellspacing
+                htmlData = "<table class=\""+mainGridName+"\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><TBody></TBody></table>",// ToDo: remove attributes: cellpadding & cellspacing
                 $table =  $($(this.element[0]).html(htmlData).find('.'+mainGridName)[0]);
             
             this.$table = $table;
             
             // Save the data object
-            $table.data(PIVOT_NAMESPACE, dataObj);
-
+//            $table.data(PIVOT_NAMESPACE, dataObj);
+            $table.data(PIVOT_NAMESPACE,{options:options});
+            
+            
             // transfer the plugin's options to the viewport
             if (viewport != null){
                 
@@ -717,8 +734,12 @@
             // Attach the tooltip on the grid's cells
             $table.find('.'+options.gridRowClassName)
                   .on("mouseenter",bind(this,function mouseEnter(e){
-                        var htmlContent = this._parseTooltipTagsInText(e.target, options.tooltipOptions.defaultHtmlContent);
-			            var xCoordinate = e.clientX + document.documentElement.scrollLeft;
+                	   	
+                	  	var template = $("#" + options.toolTipDivID).clone().css("display", "block").wrap('<div>').parent().html()
+                	  	var htmlContent = this._parseTooltipTagsInText(e.target, template)
+                	    
+                	    //var htmlContent = this._parseTooltipTagsInText(e.target, options.tooltipOptions.defaultHtmlContent);
+                        var xCoordinate = e.clientX + document.documentElement.scrollLeft;
                         var yCoordinate = e.clientY + document.documentElement.scrollTop;
                         tooltip.show({
                             tooltipHtmlContent: htmlContent,
@@ -879,9 +900,11 @@
                 if (cellIDPieces == null || cellIDPieces.length < 2) {
                     continue;
                 }
-
-                cellRow = parseInt(cellIDPieces[0])-1;
-                cellColumn = parseInt(cellIDPieces[1])-1;
+                
+                
+                // incremented these indexes to account for "cell_" prefix
+                cellRow = parseInt(cellIDPieces[1])-1;
+                cellColumn = parseInt(cellIDPieces[2])-1;
                 
                 switch(tag){
                     case "_name":
