@@ -8,8 +8,11 @@
 
 ;(function ( $, window, document, undefined ) {
     var PIVOT_NAMESPACE = "jqPivot",
+        CONTENT_CONTAINER_INNER_CELL_CLASS = PIVOT_NAMESPACE + "InnerCell",
         DATA_CURRENT_COLUMN_NUMBER = "currColNum",
-        DATA_ROW_HEIGHT = "rowHeight";
+        DATA_ROW_HEIGHT = "rowHeight",
+        SCROLLBAR_COLUMN_CLASS_NAME = "scrollbarColumn",
+        SCROLLBAR_ROW_CLASS_NAME = "scrollbarRow";
         
     var $document = $(document);
 
@@ -18,7 +21,23 @@
                 fn.apply(scope, arguments);
                 }
     }
-        
+    
+    /**
+    * Returns a JQuery object containing the grid's headers.
+    * 
+    * @private
+    * @return {object}		The JQuery object containing the Grid's headers.
+    */
+    function getGridHeaders(table) {
+        var $table = $(table),
+            $th = $table.find(">thead>tr>th,>thead>tr>td");	//if table headers are specified in its semantically correct tag, are obtained
+		if ($th.length == undefined){
+            $th = $table.find(">tbody>tr:first>th,>tr:first>th,>tbody>tr:first>td, >tr:first>td");	 //but headers can also be included in different ways
+        }
+
+        return $th;
+    };
+
     // Defines the base class for the Viewports
      function JqPivotBaseViewport(){
         this.currentPage = 0;
@@ -28,8 +47,7 @@
         this.currentGridData = null;
         this.currentRowOffset = 0;
     }
-     
-    // Viewport classes
+     // Viewport classes
 
     // Viewport base class
     JqPivotBaseViewport.prototype._super = function () {};
@@ -47,7 +65,7 @@
     * @param {object} data	An object in this format: {from:[First new row's number], to:[Last new row's number], gridData:[Place where to store the new data for the grid]}
     * @return {undefined}
     */
-    JqPivotBaseViewport.prototype.requestDataCallback = function (data) {};
+    JqPivotBaseViewport.prototype.requestDataCallback = null;
 
     /**
     * JQPivot plugin attaches a function to this callback to get notified when the viewport's scrollbars change their size.
@@ -56,7 +74,16 @@
     * @param {object} sizes	An object in this format: {horizontal:[the scrollbar's horizontal size], vertical:[the scrollbar's vertical size]}
     * @return {undefined}
     */
-    JqPivotBaseViewport.prototype.scrollbarSizeChanged = function (sizes) { };
+    JqPivotBaseViewport.prototype.scrollbarSizeChanged = null;
+
+    /**
+    * JQPivot plugin attaches a function to this callback to get notified when the viewport wants to set the columns sizes.
+    * 
+    * @method
+    * @param {array} sizes	An array of integers containing the new width of each column. If a number in the array is < 0 the size of the associated column will not be changed.
+    * @return {undefined}
+    */
+    JqPivotBaseViewport.prototype.columnSizesChanged = null;
 
     /**
     * This method gets called by the jqPivot plugin when it is ready to generate the inner table.
@@ -75,6 +102,24 @@
     * @return {undefined}
     */
     JqPivotBaseViewport.prototype._populateGridwithData = function (data) {throw new Error("populateGridwithData method is not implemented.");};
+    
+    /**
+    * This method gets called by the jqPivot plugin when it is ready to generate the inner table.
+    * 
+    * @method
+    * @param {array} sizes	An array of integers containing the new width of each column. If a number in the array is < 0 the size of the associated column will not be changed.
+    * @return {object}      The inner table container passes as input parameter containing the inner table. The returned object is assumed to be a JQuery object.
+    */
+    JqPivotBaseViewport.prototype.changeColumnsSize = function (sizes) { throw new Error("changeColumnsSize method is not implemented.");};
+
+    /**
+    * This method gets invoked when there is a need to recalculate the inner grid size because, for example, the vertical scrollabar becomes visible.
+    * 
+    * @method
+    * @return {undefined}
+    */
+    JqPivotBaseViewport.prototype._calculateInnerGridSize = function() {}
+
     JqPivotBaseViewport.prototype.maxRowsNumber = function (value) {
         // no value passed, act as a getter
 		if ( value === undefined ) {
@@ -86,7 +131,34 @@
 		}
     };
 
-    JqPivotBaseViewport.prototype._calculateInnerGridSize = function() {}
+    JqPivotBaseViewport.prototype._generateColumnHeader = function (table) {
+        var $table = $(table),
+            $theadRows = $table.find(">thead>tr");
+        
+        if ($theadRows.length < 1) {
+            var $thead = $("<thead/>");
+            
+            $theadRows = $("<tr/>");
+            
+            $thead.append($theadRows);
+            
+            $thead.prependTo($table);
+        }
+
+        // calculate the maximum number of cell across all the rows
+        var $tableRows = $table.find(">tbody>tr"),
+            rowsCount = $tableRows.length,
+            max = 0,
+            cnt;
+
+        for (cnt = 0; cnt < rowsCount; cnt++) {
+            max = Math.max(max, $($tableRows[cnt]).find("td").length);
+        }
+
+        for (cnt = 0; cnt < max; cnt++) {
+            $theadRows.append($("<th/>"));
+        }
+    }
 
     /**
     * Get the column header description for the column with the passed index
@@ -128,6 +200,14 @@
         }
 
         this.scrollbarSizeChanged({horizontal:horizontalSize, vertical:verticalSize});
+    }
+
+    JqPivotBaseViewport.prototype._raiseRequestColumnSizesChanged = function (sizes) {
+        if (this.columnSizesChanged == null){
+            return;
+        }
+
+        this.columnSizesChanged(sizes);
     }
 
     JqPivotBaseViewport.prototype.setDataFromRequest = function (data) {
@@ -204,7 +284,6 @@
                                     "top":"0px",
                                     "display":"none"
                                     }),
-                                    
             $fakeScrollerContent = $("<div />")
                             .attr("id","fake")
                             .css({ 
@@ -306,8 +385,7 @@
             columnCount = data[a].length;
             $currentRow = $("<tr/>");
             cellClasses = gridRowClassName+" "+leftCellClassName;
-           
-            
+
             for (var b = 0; b < columnCount; b++){
                 
                 if (b == columnCount-1){
@@ -334,11 +412,8 @@
             if (a == 0){
                 this.rowHeight = $currentRow.height();
             }
-
         }
-        //$("<thead/>").prependTo(this.$innerTable);
-        
-        
+
         this.currentLastRow = cnt;
 
         // Make sure that we are populating the scroller height only once and after it was created
@@ -362,7 +437,6 @@
     jqPivotScrollingViewport.prototype = new JqPivotBaseViewport(null);
     jqPivotScrollingViewport.prototype.constructor = jqPivotScrollingViewport;
     jqPivotScrollingViewport.prototype._super = JqPivotBaseViewport.prototype;
-    
     jqPivotScrollingViewport.prototype._calculateInnerGridSize = function() {
         
         if (this.$rootDiv == null){
@@ -370,24 +444,22 @@
         }
 
         var gridRows = this.options.gridRows;
-        
         // Set the inner grid height if it is defined in the plugin options
         if (gridRows > 0 && !this.rootDivHasSize) {
         	this.$rootDiv.height((this.rowHeight * gridRows)+5); //rowhight increments by 1 strangely, then * gridRows
         	this.rootDivHasSize = true
         }
-        
+
         var overflowStatus,
             verticalScrollbarSize = 0;
-        
-        // If there scrollbar are visible
+        // If the scrollbar is visible
         if (this.options.data.length > this.options.gridRows) {
-            // We have to show the scrolbar before we can calculate its size.
+            // We have to show the scrollbar before we can calculate its size.
             this.$rootDiv.css({"overflow-y" : "scroll"});
-        	
-        	// Calculate the vertical scrollbar size
+            // Calculate the vertical scrollbar size
             verticalScrollbarSize = this.$rootDiv[0].offsetWidth - this.$rootDiv[0].clientWidth;
-        } else {
+        }
+        else {
             this.$rootDiv.css({"overflow-y" : "hidden"});
         }
         
@@ -431,7 +503,6 @@
                 }
         }));
     }
-
     
     /**
     * Invoked by the jqPivot plugin when it has o populate the rows with data.
@@ -478,11 +549,11 @@
 
                 // Remove the &nbsp; and spaces
                 currentCellName = this._getColumnHeaderFromIndex(b).replace(/\s|\&nbsp;+/g, '');
-               
+
                 // Add the generic CSS classes and the specific one for this current cell
                 $currentCell = $("<td />")
                                     .addClass(cellClasses)
-                                    .attr("id", "cell_"+(a+1).toString()+"_"+(b+1).toString())
+                                    .attr("id",(a+1).toString()+"_"+(b+1).toString())
                                     .append(data[a][b]);
                
                 if (a==0){
@@ -495,23 +566,78 @@
                 
                 $currentRow.append($currentCell);
             }
-               
+                
             $innerTableTBody.append($currentRow);
 
             // Saves the row height of the first row as the base height of all the rows.
             if (a == 0){
                 this.rowHeight = $currentRow.height();
             }
-            
         }
-        
-        //$("<thead/>").prependTo(this.$innerTable);
-        
+
+        // if this is the first time that we populate data on the grid
+        // it will generate the grid headers.
+        if (this.$innerTable.find(">thead>tr").length < 1) {
+            // Generate the grid headers.
+            this._generateColumnHeader(this.$innerTable);
+
+            // Calculate the columns size
+            var columnHeaders = this.$innerTable.find(">thead>tr>th"),
+                columnCount = columnHeaders.length,
+                columnSizes = new Array();
+
+            for (var cnt = 0; cnt < columnCount; cnt++) {
+                //columnSizes.push($(columnHeaders[cnt]).width()); // ToDo: don't know why this is not working. Next thing to fix.
+                columnSizes.push(this.$innerTable.width()/columnCount);
+            }
+
+            // It invokes the column sizes changed event.
+            if (columnSizes.length > 0) {
+                this._raiseRequestColumnSizesChanged(columnSizes);
+            }
+        }
 
         this.currentLastRow += dataLen;
-
+        
         this._calculateInnerGridSize();
      }
+
+     
+    jqPivotScrollingViewport.prototype.changeColumnsSize = function (sizes) {
+         var $columnHeaders = this.$innerTable.find(">thead>tr>th"),
+             elemCount = $columnHeaders.length,
+             arrayElemCount = sizes.length,
+             currentWidth, columnWidth, $currentColumn;
+
+         if (elemCount < 1 || arrayElemCount < 1) {
+            return;
+         }
+
+        if (elemCount > arrayElemCount) {
+            elemCount = arrayElemCount;
+        }
+
+        for (var index = 0; index < elemCount; index++)
+        {
+            currentWidth = sizes[index];
+            //jquery wrap for the current column
+	        $currentColumn = $($columnHeaders[index]);
+
+
+            // if the current column size is not specified or it is the scrollbar column we skip it because
+            // We don't want to convert in percentage the width of the scrollbar because it is always fixed in px
+            if ((currentWidth < 0) || ($currentColumn.hasClass(SCROLLBAR_ROW_CLASS_NAME))) {
+                continue;
+            }
+
+            //the width of the column is converted into percentage-based measurements
+            //currentWidth = Math.round((currentWidth * 100) / tableWidth);
+            //columnWidth = currentWidth + "%";
+            columnWidth = currentWidth + "px";
+
+            $currentColumn.css("width", columnWidth);
+        }
+    }
 
     $.widget( PIVOT_NAMESPACE +".jqPivot" , {
         
@@ -582,15 +708,23 @@
                 htmlData = "<table class=\""+mainGridName+"\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><TBody></TBody></table>",// ToDo: remove attributes: cellpadding & cellspacing
                 $table =  $($(this.element[0]).html(htmlData).find('.'+mainGridName)[0]);
             
+            this.$table = $table;
+            
+            // Save the data object
+//            $table.data(PIVOT_NAMESPACE, dataObj);
             $table.data(PIVOT_NAMESPACE,{options:options});
             
-            this.$table = $table;
             
             // transfer the plugin's options to the viewport
             if (viewport != null){
-                viewport.initialize(options);// Initialize the viewport
-                viewport.requestDataCallback = bind(this, this._viewportDataRequestCallback);// Attach to the viewport data request callback
+                
+                // Initialize the viewport
+                viewport.initialize(options);
+                
+                // Attach to the viewport callbacks
+                viewport.requestDataCallback = bind(this, this._viewportDataRequestCallback);
                 viewport.scrollbarSizeChanged = bind(this, this._viewportScrollbarSizeChanged);
+                viewport.columnSizesChanged = bind (this, this._viewportColumnSizesChanged);
             }
 
             this._generateGridHeaders();
@@ -607,13 +741,11 @@
                 	    //var htmlContent = this._parseTooltipTagsInText(e.target, options.tooltipOptions.defaultHtmlContent);
                         var xCoordinate = e.clientX + document.documentElement.scrollLeft;
                         var yCoordinate = e.clientY + document.documentElement.scrollTop;
-                      
                         tooltip.show({
                             tooltipHtmlContent: htmlContent,
                             currentX: xCoordinate,
                             currentY: yCoordinate
                         });
-                       
                     })
                   )
                   .on("mouseout", bind(this, function mouseOut(e){
@@ -646,8 +778,13 @@
             this._trigger( "requestdata", null, dataObject );
         },
         _viewportScrollbarSizeChanged: function(sizes){
-        	var SCROLLBAR_COLUMN_CLASS_NAME = "scrollbarColumn",
-                SCROLLBAR_ROW_CLASS_NAME = "scrollbarRow";
+            var $table = this.$table,
+                $tableContainer = $table.find("."+CONTENT_CONTAINER_INNER_CELL_CLASS),
+                $scrollbarColumn = $table.find("."+SCROLLBAR_ROW_CLASS_NAME),
+                colSpanValue = $table.data(DATA_CURRENT_COLUMN_NUMBER),
+                dataObj = $table.data(PIVOT_NAMESPACE),
+                $columnHeaders = dataObj.columns;
+
             if (sizes.vertical > 0){
 //                var $colGroup= this.$table.find("colgroup");
 //                if ($colGroup.length < 1){
@@ -663,19 +800,78 @@
 //                $extraColumn.width(sizes.vertical);
 //                
 //                $colGroup.append($extraColumn);
-                var $table = this.$table;
-                var $th = $table.find("."+SCROLLBAR_ROW_CLASS_NAME);
-                if ($th.length < 1) {
-                    $th = $("<th>&nbsp;</th>");
-                    $th.addClass(SCROLLBAR_ROW_CLASS_NAME);
+                if ($scrollbarColumn.length < 1) {
+                    $scrollbarColumn = $("<th>&nbsp;</th>");
+                    $scrollbarColumn.addClass(SCROLLBAR_ROW_CLASS_NAME);
+
+                    $columnHeaders.push($scrollbarColumn);
+                    $table.data(PIVOT_NAMESPACE, dataObj);
                 }
                 
-                $th.width(sizes.vertical);
+                $scrollbarColumn.width(sizes.vertical);
 
                 var $tr = $table.find(">thead>tr");
                 if ($tr.length == 1) {
-                    $tr.append($th);
+                    $tr.append($scrollbarColumn);
                 }
+
+                // The vertical scrollabar is visible so we have to span one additional row.
+                colSpanValue++;
+            }
+            else if ($scrollbarColumn.length > 0){
+                $scrollbarColumn.remove();
+
+                // The scrollbar column is the last one in the array.
+                $columnHeaders.pop();
+                $table.data(PIVOT_NAMESPACE, dataObj);
+            }
+            
+            $tableContainer.attr("colspan",colSpanValue)
+            
+            this._calculateColumnSize();
+        },
+        _viewportColumnSizesChanged: function(sizes) {
+            if (sizes == undefined || sizes == null) {
+                return;
+            }
+
+            var elemCount = sizes.length;
+            if (elemCount == undefined || elemCount < 0) {
+                return;
+            }
+
+            var $table = this.$table,
+                scrollbarWidth = this._getScrollbarWidth(),
+                tableWidth = $table.width() - scrollbarWidth,
+                dataObj = $table.data(PIVOT_NAMESPACE),
+                $columnHeaders = dataObj.columns,
+                columnCount = $columnHeaders.length,
+                $currentColumn,
+                currentWidth, columnWidth;
+
+            if (elemCount > columnCount) {
+                elemCount = columnCount;
+            }
+
+            for (var index = 0; index < elemCount; index++)
+            {
+                currentWidth = sizes[index];
+                //jquery wrap for the current column
+	            $currentColumn = $columnHeaders[index];
+
+
+                // if the current column size is not specified or it is the scrollbar column we skip it because
+                // We don't want to convert in percentage the width of the scrollbar because it is always fixed in px
+                if ((currentWidth < 0) || ($currentColumn.hasClass(SCROLLBAR_ROW_CLASS_NAME))) {
+                    continue;
+                }
+
+                //the width of the column is converted into percentage-based measurements
+                //currentWidth = Math.round((currentWidth * 100) / tableWidth);
+                //columnWidth = currentWidth + "%";
+                columnWidth = currentWidth + "px";
+
+                $currentColumn.css("width", columnWidth);
             }
         },
         _parseTooltipTagsInText: function(cell, text){
@@ -718,6 +914,7 @@
                     parsedText = this.options.data[cellRow][cellColumn];
                     break;
                 }
+
                 subpieces[0] = parsedText;
                 pieces[a] = subpieces.join('');
             }
@@ -761,7 +958,6 @@
             if (options == null){
                 return;
             }
-            
 
             var headersData = options.data,
                 $table = this.$table;
@@ -775,7 +971,7 @@
                 return;
             }
 
-            // Find the maximum number of elements between all the arrays
+            // Find the maximum number of elements between all the arrays.
             var max = 0,
                 arrLen = headersData.length,
                 cnt;
@@ -787,38 +983,34 @@
             $table.data(DATA_CURRENT_COLUMN_NUMBER, max);
 
             var gridHeaderClassName = options.gridHeaderClassName,
-                colgroupHTML = "<colgroup>",
-                theadHTML = "<thead><tr>",
-                cellClasses = gridHeaderClassName+" "+options.leftCellClassName;
+                $colgroup = $("<colgroup/>"),
+                $thead = $("<thead/>"),
+                $mainRow = $("<tr />"),
+                cellClasses = gridHeaderClassName+" "+options.leftCellClassName,
+                columns = [], $currentColumn;
 
             for (cnt = 0; cnt < max; cnt++) {
                 if (cnt == max-1){
                     cellClasses = gridHeaderClassName+" "+options.rightCellClassName;
                 }
 
-                colgroupHTML += "<col class=\""+cellClasses+"\"/>";
+                $colgroup.append($("<col />").addClass(cellClasses));
                 
-                theadHTML += "<th>"+this._getColumnHeaderFromIndex(cnt)+"</th>";
+                $currentColumn = $("<th>"+this._getColumnHeaderFromIndex(cnt)+"</th>");
+
+                columns.push($currentColumn);
+                
+                $mainRow.append($currentColumn);
             }
 
-            colgroupHTML += "</colgroup>",
-            theadHTML += "</tr></thead>";
-            $(colgroupHTML+theadHTML).prependTo($table);
-        },
+            var dataObj = $table.data(PIVOT_NAMESPACE);
+            dataObj.columns = columns;
+            $table.data(PIVOT_NAMESPACE, dataObj);
 
-        /**
-        * Returns the HTMl for the grid's headers.
-        * 
-        * @private
-        * @return {object}		The HTML for the Grid's headers.
-        */
-        _getGridHeaders: function () {
-            var th = this.$table.find(">thead>tr>th,>thead>tr>td");	//if table headers are specified in its semantically correct tag, are obtained
-		    if (th.length == undefined){
-                th = this.$table.find(">tbody>tr:first>th,>tr:first>th,>tbody>tr:first>td, >tr:first>td");	 //but headers can also be included in different ways
-            }
+            $thead.append($mainRow)
+                  .prependTo($table);
 
-            return th;
+            $colgroup.prependTo($table);
         },
 
         /**
@@ -859,7 +1051,7 @@
             var $tbody = $table.find("tbody:last"),
                 $row = $("<tr />").css("border","0px"),
                 $mainColumn = $("<td />")
-                                .addClass("jqPivotInnerCell")
+                                .addClass(CONTENT_CONTAINER_INNER_CELL_CLASS)
                                 .attr("colspan",currentColNumber)
                                 .css("position","relative");
 
@@ -871,24 +1063,62 @@
             
             viewport._populateGridwithData(options.data);
         },
-        
+        _getScrollbarWidth: function () {
+            var $table = this.$table,
+                $scrollbarColumn = $table.find("."+SCROLLBAR_ROW_CLASS_NAME),
+                retVal = 0;
+            if ($scrollbarColumn.length > 0) {
+                retVal = $scrollbarColumn.width();
+            }
+
+            return retVal;
+        },
         _calculateColumnSize: function () {
-            var th = this._getGridHeaders();
+             var $table = this.$table,
+                 dataObj = $table.data(PIVOT_NAMESPACE),
+                 options = dataObj.options,
+                 $gridHeaders = dataObj.columns,
+                 elemNum = $gridHeaders.length,
+                 isScrollbarVisible = this.options.viewport, // ToDo: add the property to the viewport
+                 scrollbarWidth = this._getScrollbarWidth(), // ToDo: Duplicate this in the other places that resize the cols
+                 tableWidth = $table.width() - scrollbarWidth,
+                 $currentColumn, perc;
+
+            for (var index = 0; index < elemNum; index++)
+		    {
+                //jquery wrap for the current column
+			    $currentColumn = $gridHeaders[index];
+
+                // We don't want to convert in percentage the width of the scrollbar because it is always fixed in px
+                if ($currentColumn.hasClass(SCROLLBAR_ROW_CLASS_NAME)){
+                    continue;
+                }
+
+                //the width of the column is converted into percentage-based measurements
+                perc = Math.round(($currentColumn.width() * 100) / tableWidth) + "%";
+
+                $currentColumn.css("width", perc);
+                //the width of the column is converted into pixel-based measurements
+//              $currentColumn.width($currentColumn.width()).removeAttr("width");
+            }
         },
         /**
 	    * Function that places each grip in the correct position according to the current table layout	 * 
 	    * @param {jQuery ref} t - table object
 	    */
 	    _syncGrips : function (table){
-            var dataObj = $(table).data(PIVOT_NAMESPACE);
-		    dataObj.gripsContainer.width(table.width());		//The grip's container width is updated	
-                
-            var currentColumn;
+            var dataObj = $(table).data(PIVOT_NAMESPACE),
+                columns = dataObj.columns;
+
+            dataObj.gripsContainer.width(table.width());	//The grip's container width is updated	
+
+            var columnsCount = dataObj.columns.length,
+                $currentColumn;
                 		
-		    for(var i = 0; i < dataObj.currentLength; i++){	//for each column
-			    currentColumn = dataObj.columns[i]; 			
+		    for (var i = 0; i < columnsCount; i++){	//for each column
+			    $currentColumn = columns[i]; 			
 			    dataObj.grips[i].css({			//height and position of the grip is updated according to the table layout
-				    left: currentColumn.offset().left - table.offset().left + currentColumn.outerWidth() + Math.floor(dataObj.cellSpacing / 2) + "px",
+				    left: $currentColumn.offset().left - table.offset().left + $currentColumn.outerWidth() + Math.floor(dataObj.cellSpacing / 2) + "px",
 				    height: table.outerHeight()				
 			    });			
 		    } 	
@@ -908,6 +1138,7 @@
                 nextColumn = dataObj.columns[index+1],	
                 drag = dataObj.drag,
 		        currentColumnWidth = drag.position().left, // their new width is obtained
+                sizes = [], currentSize,
                 inc, nextColumnWidth;		
 
             inc = nextColumn.width() - (currentColumnWidth - currentColumn.width());
@@ -915,8 +1146,25 @@
 
             //and set
 		    currentColumn.width( currentColumnWidth + "px");
-            nextColumn.width(nextColumnWidth + "px");                
+            nextColumn.width(nextColumnWidth + "px");
+            
+            // Create the sizes array to update the viewport
+            for (var cnt = 0; cnt <= index+1; cnt++) {
+                if (cnt < index) {
+                    currentSize = -1;
+                } else if (cnt == index) {
+                    currentSize = currentColumnWidth;
+                } else {
+                    currentSize = nextColumnWidth;
+                }
+
+                sizes.push(currentSize);
+            }
+
+            // Call the viewport size update
+            dataObj.options.viewport.changeColumnsSize(sizes);           
 	    },
+        
         /**
         * Attach the grips for column resizing to the passed grid.
         * 
@@ -937,26 +1185,17 @@
             dataObj.drag = null;
 
             dataObj.grips = [];   // array of grips
-            dataObj.columns = []; // array of columns
             dataObj.gripsContainer = $table.prev();		
             
             dataObj.cellSpacing = parseInt($table.css('border-spacing')) || 2;
             dataObj.border = parseInt($table.css('border-left-width')) || 1;
-     
-            //ToDo: Move all the variables like grips, columns, etc. into table data
-            //$table.data("grips",tableData);
 
-		    dataObj.colGroup = $table.find("col"); 			    //a table can also contain a colgroup with col elements
+		    dataObj.colGroup = $table.find("col"); 			    // A table can also contain a colgroup with col elements
 
             var pluginInstance = this,
-                $th = this._getGridHeaders();
+                $th = dataObj.columns;
                 		
-		    dataObj.currentLength = $th.length;				    //table length is stored
-
-            // Save the data Object back
-            $table.data(PIVOT_NAMESPACE, dataObj);
-
-            //if($table.p && S && S[$table.id])memento($table,th);		//if 'postbackSafe' is enabled and there is data for the current table, its coloumn layout is restored
+            //if($table.p && S && S[$table.id])memento($table,th);		// If 'postbackSafe' is enabled and there is data for the current table, its coloumn layout is restored
 
             /**
 	         * Event handler fired when the browser is resized. The main purpose of this function is to update
@@ -968,11 +1207,16 @@
                     mainGridName = dataObj.options.mainGridClassName;		
                 $table.removeClass(mainGridName);						//firefox doesnt like layout-fixed in some cases
 
-                var tableLength = dataObj.currentLength,
+                var columnCount = columns.length,
                     tableWidth = $table.width(),
-                    perc, i;
+                    $scrollbarColumn = $table.find("."+SCROLLBAR_ROW_CLASS_NAME),
+                    perc;
 
-				for(i=0; i < tableLength; i++) {
+                if ($th.length > 0){// ToDo: Duplicate this in the other places that resize the cols
+                   tableWidth -= $scrollbarColumn.width();
+                }
+
+				for(var i=0; i < columnCount; i++) {
                     perc = Math.round((columns[i].width() * 100) / tableWidth) + "%";
                     columns[i].css("width", perc);
                 }
@@ -1066,6 +1310,7 @@
 		        var dataObj = $table.data(PIVOT_NAMESPACE),
                     gripData = $(this).data(PIVOT_NAMESPACE),	    //retrieve grip's data
 		            grip = dataObj.grips[gripData.columnIndex];		//shortcuts for the table and grip objects
+
 		        grip.originalX = e.pageX;
                 grip.left = grip.position().left;	//the initial position is kept
                 			
@@ -1073,44 +1318,48 @@
                            .on('mouseup.'+PIVOT_NAMESPACE,onGripDragOver);	//mousemove and mouseup events are bound
 		        $("head").append("<style type='text/css'>*{cursor:"+ dataObj.options.dragCursor +"!important}</style>"); 	//change the mouse cursor		
 		        grip.addClass(PIVOT_NAMESPACE+"GripDrag"); 	//add the dragging class (to allow some visual feedback)
+
                 dataObj.drag = grip; // the current grip is stored as the current dragging object
                 $table.data(PIVOT_NAMESPACE, dataObj);
 		        
 		        return false; 	//prevent text selection
 	        };
 
-		    $th.each(function(index){					//iterate through the table column headers			
-			    var dataObj = $table.data(PIVOT_NAMESPACE),
-                    options = dataObj.options,
-                    $currentColumn = $(this), 			//jquery wrap for the current column		
-			        $grip = $(dataObj.gripsContainer.append('<div class="'+PIVOT_NAMESPACE+'Grip"></div>')[0].lastChild); //add the visual node to be used as grip
+            //iterate through the table column headers adding the grips to the table
+            var elemNum = $th.length,
+                options = dataObj.options,
+                $currentColumn, $grip;
 
-                //the width of the column is converted into percentage-based measurements
-                var perc = Math.round(($currentColumn.width() * 100) / $table.width()) + "%";
-                $currentColumn.css("width", perc);
-                //the width of the column is converted into pixel-based measurements
-//              $currentColumn.width($currentColumn.width()).removeAttr("width");
+            for (var index = 0; index < elemNum; index++) {			
+                //jquery wrap for the current column
+                $currentColumn = $($th[index]);
+			    
+                $grip = $("<div />").addClass(PIVOT_NAMESPACE+"Grip"); 
+                
+                //add the visual node to be used as grip
+                dataObj.gripsContainer.append($grip);
                 
                 //some values are stored in the grip's node data
                 $grip.columnIndex = index;
                 $grip.columns = $currentColumn;
                 
-                //the current grip and column are added to its table object
+                //the current grip is added to its table object
 			    dataObj.grips.push($grip);
-                dataObj.columns.push($currentColumn);
                 
                 var $gripHtml = options.gripInnerHtml;
                 if ($gripHtml == null || $gripHtml.length < 6) // the minimum size for the html is 6 because at least the user has to use "<div/>" as html for the grip.
-                    $gripHtml = "<div class='grip'></div>";
+                    $gripHtml = $("<div />").addClass("grip");
 
                 var hoverCursor = options.hoverCursor;
                 if (hoverCursor == null)
                     hoverCursor = '';
 
-			    if (index < dataObj.currentLength-1) { //bind the mousedown event to start dragging 
+			    if (index < elemNum) { //bind the mousedown event to start dragging 
                 	$grip.mousedown(onGripMouseDown)
                         .append($gripHtml)
-                        .append('<div class="'+PIVOT_NAMESPACE+'ColResizer" style="cursor:'+hoverCursor+'"></div>');
+                        .append($("<div />").addClass(PIVOT_NAMESPACE+"ColResizer")
+                                            .css("cursor",hoverCursor)
+                               );
                 }
 			    else { //the last grip is used only to store data
                     $grip.addClass(PIVOT_NAMESPACE+"LastGrip")
@@ -1118,9 +1367,13 @@
                 }
 
 			    $grip.data(PIVOT_NAMESPACE, {columnIndex:index, table:$table.attr('class')}); //grip index and its table name are stored in the HTML 												
-		    });
+		    }
 
 		    dataObj.colGroup.removeAttr("width");	//remove the width attribute from elements in the colgroup (in any)
+            
+            // Save the data object back
+            $table.data(PIVOT_NAMESPACE, dataObj);
+
 		    pluginInstance._syncGrips($table); 		//the grips are positioned according to the current table layout
 
 		    //there is a small problem, some cells in the table could contain dimension values interfering with the 
@@ -1158,6 +1411,7 @@
                         tooltipWidth = params.tooltipWidth,
                         currentX = parseInt(params.currentX),
                         currentY = parseInt(params.currentY);
+
                     if (isNaN(currentX) || isNaN(currentY)){
                         throw "Undefined coordinates.";
                     }
@@ -1179,7 +1433,6 @@
 				        mainDiv.style.filter = 'alpha(opacity=0)';
                         mainDiv.style.position = 'absolute';
 			        }
-			        
 			        mainDiv.style.display = 'block';
                     if (tooltipHtmlContent == null){
                         tooltipHtmlContent = "";
@@ -1216,10 +1469,10 @@
 
 		        },
 		        calculatePosition: function calculatePosition(clientX, clientY){
-		        	 var currentTop = clientY + document.documentElement.scrollTop;
-		        	 var currentLeft = clientX + document.documentElement.scrollLeft;
-		        	 mainDiv.style.top = (currentTop - tooltipHeight) + 'px';
-		        	 mainDiv.style.left = (currentLeft + leftOffset) + 'px';
+			        var currentTop = clientY + document.documentElement.scrollTop;
+			        var currentLeft = clientX + document.documentElement.scrollLeft;
+			        mainDiv.style.top = (currentTop - tooltipHeight) + 'px';
+			        mainDiv.style.left = (currentLeft + leftOffset) + 'px';
 		        },
 		        fade: function fade(isFadeIn){
 			        if((alpha != endAlpha && isFadeIn === true) || (alpha != 0 && isFadeIn !== true)){
@@ -1235,12 +1488,11 @@
 				        mainDiv.style.opacity = alpha * .01;
 				        mainDiv.style.filter = 'alpha(opacity=' + alpha + ')';
 			        }else{
-			        	clearInterval(mainDiv.timer);
+				        clearInterval(mainDiv.timer);
 				        if(isFadeIn !== true){
                             mainDiv.style.display = 'none'
                         }
 			        }
-			        
 		        },
 		        hide: function hide(){
 			        clearInterval(mainDiv.timer);
