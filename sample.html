@@ -1,0 +1,71 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html class="no-js" lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8">
+	<title>jqPivot</title>
+	<script src="js/vendor/jquery.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/theme.css" />
+	<link rel="stylesheet" type="text/css" href="css/jqPivot.css" />
+	<style>
+		
+		.jqPivotInnerTable td{
+			border:4px solid #fff;
+			border-left:0px;
+		}
+		.f th{
+			border:3px solid red;
+		}
+	</style>
+</head>
+<body>
+
+
+<p>&nbsp</p>
+
+<table class="jqPivotTable">
+<thead>
+	<tr><th>head 1</th><th>head 2</th></tr>
+</thead>
+<tbody>
+	<tr>
+		<td colspan="2">
+			<div style="height:200px; overflow-x:hidden; overflow-y:scroll">
+			<table class="jqPivotInnerTable">
+				<tbody>
+					<tr><td style="border-top:0px">1</td><td style="border-top:0px">2</td></tr>
+				</tbody>
+			</table>
+			</div>
+		</td>
+	</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p><p>&nbsp;</p>
+<input type="button" value="add rows" id="adder">
+
+<script>
+
+$(document).ready(function(){
+	
+	window.getRow = function(i){
+		return newRow = "<tr><td>A"+i+"</td><td>B"+i+"</td></tr>"
+	};
+	
+	
+	
+	$("#adder").bind("click", function(){
+		newRow = ""
+		for(var i=0;i<100; i++){
+			newRow += window.getRow(i);
+		}
+		$(".jqPivotInnerTable").append(newRow)
+	});
+	
+})
+</script>
+
+</body>
+</html>

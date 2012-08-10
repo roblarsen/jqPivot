@@ -4,64 +4,103 @@ body{
 	text-align: center;
 	padding: 55px;
 	font-family: Helvetica, Arial, sans-serif;
+	display: inline-block;z
 }
 
 /* think about naming here for these selectors? */
 
+.jqPivot th td {
+	display: inline-block;
+}
+
 .jqPivotTable th {
 	padding:10px;
 	border:3px solid #ccc;
-	background: #fff;
-	background: -moz-linear-gradient (
-		top, 
-		#ffffff 0%,
-		#f3f3f3 50%, 
-		#ededed 51%, 
-		#ffffff 100%
+	background: rgb(252,254,255);
+	background: -moz-linear-gradient(
+		top,  
+		rgba(252,254,255,1) 0%, 
+		rgba(232,236,237,1) 100%
 	);
-	background: -webkit-gradient (
+	background: -webkit-gradient(
 		linear, 
 		left top, 
 		left bottom, 
-		color-stop(0%,#ffffff), 
-		color-stop(50%,#f3f3f3), 
-		color-stop(51%,#ededed), 
-		color-stop(100%,#ffffff)
+		color-stop(0%,rgba(252,254,255,1)), 
+		color-stop(100%,rgba(232,236,237,1))
 	);
 	background: -webkit-linear-gradient(
-		top, 
-		#ffffff 0%,
-		#f3f3f3 50%,
-		#ededed 51%,
-		#ffffff 100%
+		top,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
 	);
 	background: -o-linear-gradient(
 		top,  
-		#ffffff 0%,
-		#f3f3f3 50%,
-		#ededed 51%,
-		#ffffff 100%
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
 	);
 	background: -ms-linear-gradient(
-		top,
-		#ffffff 0%,
-		#f3f3f3 50%,
-		#ededed 51%,
-		#ffffff 100%
+		top,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
 	);
 	background: linear-gradient(
 		to bottom,  
-		#ffffff 0%,
-		#f3f3f3 50%,
-		#ededed 51%,
-		#ffffff 100%
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
 	);
 	filter: progid:DXImageTransform.Microsoft.gradient( 
-		startColorstr='#ffffff', 
-		endColorstr='#ffffff',
-		GradientType=0
+		startColorstr='#fcfeff', 
+		endColorstr='#e8eced',
+		GradientType=0 
 	);
 }
+
+/*
+.jqPivotTable th {
+	padding:10px;
+	border:3px solid #ccc;
+	background: rgb(252,254,255);
+	background: -moz-linear-gradient(
+		top,  
+		rgba(252,254,255,1) 0%, 
+		rgba(232,236,237,1) 100%
+	);
+	background: -webkit-gradient(
+		linear, 
+		left top, 
+		left bottom, 
+		color-stop(0%,rgba(252,254,255,1)), 
+		color-stop(100%,rgba(232,236,237,1))
+	);
+	background: -webkit-linear-gradient(
+		top,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
+	);
+	background: -o-linear-gradient(
+		top,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
+	);
+	background: -ms-linear-gradient(
+		top,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
+	);
+	background: linear-gradient(
+		to bottom,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
+	);
+	filter: progid:DXImageTransform.Microsoft.gradient( 
+		startColorstr='#fcfeff', 
+		endColorstr='#e8eced',
+		GradientType=0 
+	);
+
+}
+*/
 
 
 .jqPivotTable td {
