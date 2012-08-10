@@ -737,9 +737,9 @@
                 	   	
                 	  	var template = $("#" + options.toolTipDivID).clone().css("display", "block").wrap('<div>').parent().html()
                 	  	var htmlContent = this._parseTooltipTagsInText(e.target, template)
-                	    
                 	    //var htmlContent = this._parseTooltipTagsInText(e.target, options.tooltipOptions.defaultHtmlContent);
-                        var xCoordinate = e.clientX + document.documentElement.scrollLeft;
+                        
+                	  	var xCoordinate = e.clientX + document.documentElement.scrollLeft;
                         var yCoordinate = e.clientY + document.documentElement.scrollTop;
                         tooltip.show({
                             tooltipHtmlContent: htmlContent,
@@ -875,6 +875,7 @@
             }
         },
         _parseTooltipTagsInText: function(cell, text){
+        	
             if ( text == null || text.length < 1 ||
                  cell == null || cell.id == null )
                 return "";
@@ -900,15 +901,15 @@
                 if (cellIDPieces == null || cellIDPieces.length < 2) {
                     continue;
                 }
-                
-                
+              
                 // incremented these indexes to account for "cell_" prefix
-                cellRow = parseInt(cellIDPieces[1])-1;
-                cellColumn = parseInt(cellIDPieces[2])-1;
+                cellRow = parseInt(cellIDPieces[0])-1;
+                cellColumn = parseInt(cellIDPieces[1])-1;
                 
                 switch(tag){
                     case "_name":
                     parsedText = this._getColumnHeaderFromIndex(cellColumn);
+                    
                     break;
                     case "value":
                     parsedText = this.options.data[cellRow][cellColumn];
