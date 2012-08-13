@@ -1,24 +1,23 @@
-
 .jqPivotTable, .jqPivotInnerTable{
 	width:100%;
-/*	max-width:1600px;*/
 	border-spacing:0;
 	border-collapse:collapse;
 	margin:0;
 	padding:0;
-/*	position: relative;*/
+/*	position: relative; */
 }
 
-.jqPivotInnerTable th{
-	display:none;	
+
+.jqPivotInnerTable tr th{
+	/* hide this from UI, must not be display:none as events are bound to it */
+	height:0px;
+	border:0px;
+	padding:0px;
 }
 
 .jqPivotInnerTable th, .jqPivotInnerTable td{
    border-left:0px;
 }
-
-/* ?? */
-
 .grip{
 	width:20px;
 	height:30px;
