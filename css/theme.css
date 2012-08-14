@@ -4,7 +4,7 @@ body{
 	text-align: center;
 	padding: 55px;
 	font-family: Helvetica, Arial, sans-serif;
-	display: inline-block;z
+	display: inline-block;
 }
 
 /* think about naming here for these selectors? */
@@ -16,7 +16,7 @@ body{
 .jqPivotTable th {
 	padding:10px;
 	border:3px solid #ccc;
-	background: rgb(252,254,255);
+	background:#e8eced;
 	background: -moz-linear-gradient(
 		top,  
 		rgba(252,254,255,1) 0%, 
@@ -49,11 +49,13 @@ body{
 		rgba(252,254,255,1) 0%,
 		rgba(232,236,237,1) 100%
 	);
+	/*
 	filter: progid:DXImageTransform.Microsoft.gradient( 
 		startColorstr='#fcfeff', 
 		endColorstr='#e8eced',
 		GradientType=0 
 	);
+	*/
 }
 
 /*
@@ -114,7 +116,7 @@ body{
 	border-collapse:separate;
 	border:3px solid #fff;
 	padding:10px;
-	background: #e9f6fd;
+	background: #d3eefb;
 	background: -moz-linear-gradient(
 		top,  
 		#e9f6fd 0%, 
@@ -147,11 +149,14 @@ body{
 		#e9f6fd 0%,
 		#d3eefb 100%
 	);
+	/*
 	filter: progid:DXImageTransform.Microsoft.gradient(
 		startColorstr='#e9f6fd', 
 		endColorstr='#d3eefb',
 		GradientType=0
 	);
+	*/
+	
 }
 
 .jqPivotTooltip {
