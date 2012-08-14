@@ -295,8 +295,7 @@
 
         this.$innerTable.append($innerTableTBody);
         $innerTableContainer.append(this.$innerTable)
-                            .append($scroller)
-                            .append($("<div/>").attr("id","cap"));
+                            .append($scroller);
 
         $scroller.on("scroll", bind(this, function onScroll () {
             var thumb = arguments[0].currentTarget,
@@ -400,7 +399,7 @@
                                     .append(data[a][b]);
                
                 if (a==0){
-                	$currentCell.css({"border-top":"0px none"})
+                	$currentCell.css({"border-top":"0px none"});
                 }
                 
                 $currentRow.append($currentCell);
@@ -557,7 +556,7 @@
                                     .append(data[a][b]);
                
                 if (a==0){
-                	$currentCell.css({"border-top":"0"})
+                	$currentCell.css({"border-top":"0"});
                 }
                 
                 if (currentCellName.length > 0){
@@ -786,20 +785,6 @@
                 $columnHeaders = dataObj.columns;
 
             if (sizes.vertical > 0){
-//                var $colGroup= this.$table.find("colgroup");
-//                if ($colGroup.length < 1){
-//                    return;
-//                }
-
-//                var $extraColumn = $colGroup.find("."+SCROLLBAR_COLUMN_CLASS_NAME);
-//                if ($extraColumn.length < 1) {
-//                    $extraColumn = $("<col />");
-//                    $extraColumn.addClass(SCROLLBAR_COLUMN_CLASS_NAME);
-//                }
-
-//                $extraColumn.width(sizes.vertical);
-//                
-//                $colGroup.append($extraColumn);
                 if ($scrollbarColumn.length < 1) {
                     $scrollbarColumn = $("<th>&nbsp;</th>");
                     $scrollbarColumn.addClass(SCROLLBAR_ROW_CLASS_NAME);
@@ -1247,17 +1232,14 @@
                     grips = dataObj.grips,
                     $currentGrip = $(grips[columnIndex].find("."+PIVOT_NAMESPACE+"ColResizer")[0]),
                     x = e.pageX - $table.position().left - Math.floor(($currentGrip.width()/2)),	 //next position according to horizontal mouse position increment
+                    rightColumnBorderCoord = 0,
 		            min = dataObj.cellSpacing*1.5 + minWidth + dataObj.border,
-                    max, rightColumnBorderCoord;
-
-		        if (columnIndex > 0)
-                    x -= grips[columnIndex-1].position().left;
+                    max;
 
                 //max position according to the contiguous cells
-                if (columnIndex == 0){
-                    rightColumnBorderCoord = 0
-                } else {
+                if (columnIndex > 0){
                     rightColumnBorderCoord = grips[columnIndex-1].position().left;
+                    x -= rightColumnBorderCoord;
                 }
 
                 max =  grips[columnIndex+1].position().left - rightColumnBorderCoord - minWidth;
@@ -1335,7 +1317,7 @@
                 //jquery wrap for the current column
                 $currentColumn = $($th[index]);
 			    
-                $grip = $("<div />").addClass(PIVOT_NAMESPACE+"Grip"); 
+                $grip = $("<div />"); 
                 
                 //add the visual node to be used as grip
                 dataObj.gripsContainer.append($grip);
@@ -1354,17 +1336,23 @@
                 var hoverCursor = options.hoverCursor;
                 if (hoverCursor == null)
                     hoverCursor = '';
+                if (index < elemNum-1) {
+                    $grip.addClass(PIVOT_NAMESPACE+"Grip");
 
-			    if (index < elemNum) { //bind the mousedown event to start dragging 
-                	$grip.mousedown(onGripMouseDown)
-                        .append($gripHtml)
-                        .append($("<div />").addClass(PIVOT_NAMESPACE+"ColResizer")
-                                            .css("cursor",hoverCursor)
-                               );
+                    // If the current column is a scrollbar we don't add the drag functionality
+                    if ($th[index+1].hasClass(SCROLLBAR_ROW_CLASS_NAME)) {
+                        $grip.addClass(PIVOT_NAMESPACE+"ScrollbarGrip");	
+                    }
+			        else { // otherwise it binds the mousedown event to start dragging
+                	        $grip.mousedown(onGripMouseDown)
+                                .append($gripHtml)
+                                .append($("<div />").addClass(PIVOT_NAMESPACE+"ColResizer")
+                                                    .css("cursor",hoverCursor)
+                                       );
+                         }
                 }
 			    else { //the last grip is used only to store data
-                    $grip.addClass(PIVOT_NAMESPACE+"LastGrip")
-                         .removeClass(PIVOT_NAMESPACE+"Grip");	
+                    $grip.addClass(PIVOT_NAMESPACE+"LastGrip");	
                 }
 
 			    $grip.data(PIVOT_NAMESPACE, {columnIndex:index, table:$table.attr('class')}); //grip index and its table name are stored in the HTML 												

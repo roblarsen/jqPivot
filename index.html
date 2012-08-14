@@ -25,19 +25,21 @@
 	    
 	    $(document).ready(function () {
 	        var callbackToken,
-	            historicalData = GenerateStockData(5, 100),
+                maxRowsNumber = 100,
+	            historicalData = GenerateStockData(5, maxRowsNumber),
 	            columnHeaders = ["Stock", "Value", "Date", "Q/Q Change", "Y/Y Change"],
 	            grid = $("#grid").jqPivot({
 	                data: historicalData.slice(0, 20),
 	                viewport: new $.jqPivot.jqPivotScrollingViewport(),
-	                gridRows: 3,
+	                gridRows: 10,
 	                columnHeaders: columnHeaders,
 	                liveDrag: true,
 	                toolTipDivID: "myToolTip"
 	                //tooltipOptions: { defaultHtmlContent: "<div class=\"jqPivotTooltip\">This tooltip is showing<br><b>{{_name}}</b>: {{value}}</div>" }
 	            });
-	        
-	        grid.jqPivot("maxRowsNumber", 100);
+         //$("<div/>").jqPivot.jqPivotPagingViewport(1);
+             grid.jqPivot("maxRowsNumber", maxRowsNumber);
+          //grid.options("viewport", "a");
 	
 	        grid.on("jqpivotrequestdata", bind(this, function (event, data) {
 	            callbackToken = data;
