@@ -4,10 +4,8 @@ body{
 	text-align: center;
 	padding: 55px;
 	font-family: Helvetica, Arial, sans-serif;
-	display: inline-block;
 }
 
-/* think about naming here for these selectors? */
 
 .jqPivot th td {
 	display: inline-block;
@@ -49,61 +47,7 @@ body{
 		rgba(252,254,255,1) 0%,
 		rgba(232,236,237,1) 100%
 	);
-	/*
-	filter: progid:DXImageTransform.Microsoft.gradient( 
-		startColorstr='#fcfeff', 
-		endColorstr='#e8eced',
-		GradientType=0 
-	);
-	*/
 }
-
-/*
-.jqPivotTable th {
-	padding:10px;
-	border:3px solid #ccc;
-	background: rgb(252,254,255);
-	background: -moz-linear-gradient(
-		top,  
-		rgba(252,254,255,1) 0%, 
-		rgba(232,236,237,1) 100%
-	);
-	background: -webkit-gradient(
-		linear, 
-		left top, 
-		left bottom, 
-		color-stop(0%,rgba(252,254,255,1)), 
-		color-stop(100%,rgba(232,236,237,1))
-	);
-	background: -webkit-linear-gradient(
-		top,  
-		rgba(252,254,255,1) 0%,
-		rgba(232,236,237,1) 100%
-	);
-	background: -o-linear-gradient(
-		top,  
-		rgba(252,254,255,1) 0%,
-		rgba(232,236,237,1) 100%
-	);
-	background: -ms-linear-gradient(
-		top,  
-		rgba(252,254,255,1) 0%,
-		rgba(232,236,237,1) 100%
-	);
-	background: linear-gradient(
-		to bottom,  
-		rgba(252,254,255,1) 0%,
-		rgba(232,236,237,1) 100%
-	);
-	filter: progid:DXImageTransform.Microsoft.gradient( 
-		startColorstr='#fcfeff', 
-		endColorstr='#e8eced',
-		GradientType=0 
-	);
-
-}
-*/
-
 
 .jqPivotTable td {
 	border-left:3px solid #ccc;
@@ -149,20 +93,28 @@ body{
 		#e9f6fd 0%,
 		#d3eefb 100%
 	);
-	/*
-	filter: progid:DXImageTransform.Microsoft.gradient(
-		startColorstr='#e9f6fd', 
-		endColorstr='#d3eefb',
-		GradientType=0
-	);
-	*/
 	
 }
-
 .jqPivotTooltip {
-	-moz-border-radius: 10px;
-	border-radius: 10px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
 	padding:10px;
 	box-shadow: 3px 3px 8px #888888;
-	background-color:silver;
+	border:2px solid #BFB79A;
+	background-color: #fff4ce;
 }
+
+
+/*
+.tooltip-arrow {
+	width:0; 
+	height:0; 
+	border-left: 12px solid transparent; 
+	border-right: 12px solid transparent;
+	border-top: 12px solid #fff4ce;
+	border-bottom: 0;
+	position:absolute;
+	margin-top:10px;
+	margin-left:6px;
+}
+*/
