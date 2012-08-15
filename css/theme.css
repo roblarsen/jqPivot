@@ -1,0 +1,120 @@
+
+body{
+	background-color: white;
+	text-align: center;
+	padding: 55px;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+
+.jqPivot th td {
+	display: inline-block;
+}
+
+.jqPivotTable th {
+	padding:10px;
+	border:3px solid #ccc;
+	background:#e8eced;
+	background: -moz-linear-gradient(
+		top,  
+		rgba(252,254,255,1) 0%, 
+		rgba(232,236,237,1) 100%
+	);
+	background: -webkit-gradient(
+		linear, 
+		left top, 
+		left bottom, 
+		color-stop(0%,rgba(252,254,255,1)), 
+		color-stop(100%,rgba(232,236,237,1))
+	);
+	background: -webkit-linear-gradient(
+		top,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
+	);
+	background: -o-linear-gradient(
+		top,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
+	);
+	background: -ms-linear-gradient(
+		top,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
+	);
+	background: linear-gradient(
+		to bottom,  
+		rgba(252,254,255,1) 0%,
+		rgba(232,236,237,1) 100%
+	);
+}
+
+.jqPivotTable td {
+	border-left:3px solid #ccc;
+	border-bottom:3px solid #ccc;
+	padding:0px;
+}
+
+.jqPivotInnerTable td {
+	text-align:left;
+	border-collapse:separate;
+	border:3px solid #fff;
+	padding:10px;
+	background: #d3eefb;
+	background: -moz-linear-gradient(
+		top,  
+		#e9f6fd 0%, 
+		#d3eefb 100%
+	);
+	background: -webkit-gradient(
+		linear, 
+		left top, 
+		left bottom, 
+		color-stop(0%,#e9f6fd), 
+		color-stop(100%,#d3eefb)
+	);
+	background: -webkit-linear-gradient(
+		top,  
+		#e9f6fd 0%,
+		#d3eefb 100%
+	);
+	background: -o-linear-gradient(
+		top,  
+		#e9f6fd 0%,
+		#d3eefb 100%
+	);
+	background: -ms-linear-gradient(
+		top, 
+		#e9f6fd 0%,
+		#d3eefb 100%
+	);
+	background: linear-gradient(
+		to bottom,  
+		#e9f6fd 0%,
+		#d3eefb 100%
+	);
+	
+}
+.jqPivotTooltip {
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding:10px;
+	box-shadow: 3px 3px 8px #888888;
+	border:2px solid #BFB79A;
+	background-color: #fff4ce;
+}
+
+
+/*
+.tooltip-arrow {
+	width:0; 
+	height:0; 
+	border-left: 12px solid transparent; 
+	border-right: 12px solid transparent;
+	border-top: 12px solid #fff4ce;
+	border-bottom: 0;
+	position:absolute;
+	margin-top:10px;
+	margin-left:6px;
+}
+*/
