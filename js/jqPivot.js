@@ -301,24 +301,8 @@
 
         // Create the inner table and the scroller
         var $innerTableTBody = $("<tbody />"),
-            $scroller = $("<div />")
-                            .attr("id","scroller")
-                            .css({ 
-                                    "width":"18px",
-                                    "height":"0px",
-                                    "overflow-y":"scroll",
-                                    "overflow-x":"hidden",
-                                    "position":"absolute",
-                                    "right":"0px",
-                                    "top":"0px",
-                                    "display":"none"
-                                    }),
-            $fakeScrollerContent = $("<div />")
-                            .attr("id","fake")
-                            .css({ 
-                                    "height":"0px",
-                                    "width":"1px"
-                                    });
+            $scroller = $("<div />").attr("id","scroller"),
+            $fakeScrollerContent = $("<div />").attr("id","fake");
 
         $scroller.append($fakeScrollerContent);
 
@@ -431,6 +415,9 @@
                 rowsArray.push($currentCell);
 
                 if (a==0){
+                    // programitcally remove top border from first row's cells
+                    // to prevent double borders in layout
+                    // ToDo: add a class here to manage from jqPivot.css
                 	$currentCell.css({"border-top":"0px none"});
                 }
                 
@@ -597,13 +584,7 @@
     */
     jqPivotScrollingViewport.prototype.createInnerTable = function (innerTableContainer) {
 
-        this.$rootDiv = $("<div />").css({ 
-                                            "overflow-y":"hidden",
-                                            "overflow-x":"hidden",
-                                            "margin":"0px",
-                                            "padding":"0px",
-                                            "border":"0px"                                            	
-                                        });
+        this.$rootDiv = $("<div />").attr("id", "jqPivotScrollingViewportContainer");
 
         this.$innerTable = $("<table />").addClass("jqPivotInnerTable")
                                          .append($("<tbody />"));
@@ -679,7 +660,10 @@
                 rowsArray.push($currentCell);
 
                 if (a==0){
-                	$currentCell.css({"border-top":"0"});
+                    // programitcally remove top border from first row's cells
+                    // to prevent double borders in layout
+                    // ToDo: add a class here to manage from jqPivot.css
+                    $currentCell.css({"border-top":"0"});
                 }
                 
                 if (currentCellName.length > 0){
@@ -811,7 +795,7 @@
             var options = this.options,
                 viewport = options.viewport,
                 mainGridName = options.mainGridClassName,
-                htmlData = "<table class=\""+mainGridName+"\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><TBody></TBody></table>",// ToDo: remove attributes: cellpadding & cellspacing
+                htmlData = "<table class=\""+mainGridName+"\"><TBody></TBody></table>",
                 $table =  $($(this.element[0]).html(htmlData).find('.'+mainGridName)[0]);
             
             this.$table = $table;
@@ -1279,11 +1263,11 @@
         _createGripsInGrid: function (){
 
             // Attach the styles
-            $("head").append("<style type='text/css'>."+PIVOT_NAMESPACE+"Grips{ height:0px; position:relative;} ."+PIVOT_NAMESPACE+"Grip{margin-left:-2px; position:absolute; z-index:5; } ."+PIVOT_NAMESPACE+"Grip ."+PIVOT_NAMESPACE+"ColResizer{position:absolute;background-color:red;opacity:0;width:10px;height:100%;top:0px} ."+PIVOT_NAMESPACE+"Table, ."+PIVOT_NAMESPACE+"InnerTable {table-layout:fixed;} ."+PIVOT_NAMESPACE+"Table td, ."+PIVOT_NAMESPACE+"Table th{overflow:hidden;padding-left:0!important; padding-right:0!important;} ."+PIVOT_NAMESPACE+"LastGrip{position:absolute; width:1px;} ."+PIVOT_NAMESPACE+"GripDrag{ margin-left:2px; border-left:1px dotted black;}</style>");
+            //$("head").append("<style type='text/css'>."+PIVOT_NAMESPACE+"Grips{ height:0px; position:relative;} ."+PIVOT_NAMESPACE+"Grip{margin-left:-2px; position:absolute; z-index:5; } ."+PIVOT_NAMESPACE+"Grip ."+PIVOT_NAMESPACE+"ColResizer{position:absolute;background-color:red;opacity:0;width:10px;height:100%;top:0px} ."+PIVOT_NAMESPACE+"Table, ."+PIVOT_NAMESPACE+"InnerTable {table-layout:fixed;} ."+PIVOT_NAMESPACE+"Table td, ."+PIVOT_NAMESPACE+"Table th{overflow:hidden;padding-left:0!important; padding-right:0!important;} ."+PIVOT_NAMESPACE+"LastGrip{position:absolute; width:1px;} ."+PIVOT_NAMESPACE+"GripDrag{ margin-left:2px; border-left:1px dotted black;}</style>");
 
             var $table = this.$table;
             
-            $table.before('<div class="'+PIVOT_NAMESPACE+'Grips"/>');	//the grips container object is added. Signature class forces table rendering in fixed-layout mode to prevent column's min-width
+            $table.before('<div class="jqPivotGrips"/>');	//the grips container object is added. Signature class forces table rendering in fixed-layout mode to prevent column's min-width
 
             var dataObj = $table.data(PIVOT_NAMESPACE);
             dataObj.drag = null;
@@ -1420,8 +1404,12 @@
                 grip.left = grip.position().left;	//the initial position is kept
                 			
 		        $(document).on('mousemove.'+PIVOT_NAMESPACE, onGripDrag)
-                           .on('mouseup.'+PIVOT_NAMESPACE,onGripDragOver);	//mousemove and mouseup events are bound
-		        $("head").append("<style type='text/css'>*{cursor:"+ dataObj.options.dragCursor +"!important}</style>"); 	//change the mouse cursor		
+                           .on('mouseup.'+PIVOT_NAMESPACE,onGripDragOver);	//mousemove and mouseup events are bound 
+		        
+                //ToDo: whats this doing here, put in jqPivot.css?  
+                $("head").append("<style type='text/css'>*{cursor:"+ dataObj.options.dragCursor +"!important}</style>"); 	
+                
+                //change the mouse cursor		
 		        grip.addClass(PIVOT_NAMESPACE+"GripDrag"); 	//add the dragging class (to allow some visual feedback)
 
                 dataObj.drag = grip; // the current grip is stored as the current dragging object
