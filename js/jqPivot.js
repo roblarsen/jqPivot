@@ -301,7 +301,12 @@
 
         // Create the inner table and the scroller
         var $innerTableTBody = $("<tbody />"),
-            $scroller = $("<div />").attr("id","scroller"),
+            $scroller = $("<div />").attr("id","scroller")
+                                 .css({
+                                        "width":"18px",
+                                        "height":"0px",
+                                        "display":"none"
+                                      }),
             $fakeScrollerContent = $("<div />").attr("id","fake");
 
         $scroller.append($fakeScrollerContent);
@@ -584,9 +589,9 @@
     */
     jqPivotScrollingViewport.prototype.createInnerTable = function (innerTableContainer) {
 
-        this.$rootDiv = $("<div />").attr("id", "jqPivotScrollingViewportContainer");
+        this.$rootDiv = $("<div />").attr("id", PIVOT_NAMESPACE+"ScrollingViewportContainer");
 
-        this.$innerTable = $("<table />").addClass("jqPivotInnerTable")
+        this.$innerTable = $("<table />").addClass(PIVOT_NAMESPACE+"InnerTable")
                                          .append($("<tbody />"));
 
         this.$rootDiv.append(this.$innerTable);
@@ -1267,7 +1272,7 @@
 
             var $table = this.$table;
             
-            $table.before('<div class="jqPivotGrips"/>');	//the grips container object is added. Signature class forces table rendering in fixed-layout mode to prevent column's min-width
+            $table.before('<div class="'+PIVOT_NAMESPACE+'Grips"/>');	//the grips container object is added. Signature class forces table rendering in fixed-layout mode to prevent column's min-width
 
             var dataObj = $table.data(PIVOT_NAMESPACE);
             dataObj.drag = null;
