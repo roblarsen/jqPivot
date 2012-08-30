@@ -258,6 +258,7 @@
         this.$fakeContent = null;
         this.scrollerThumbPosition = 0;
         this.currentLastRow = 0;
+        this._wasScrollbarPositionAdjusted = false;
     }
     
     //Take care of the inheritance first
@@ -351,8 +352,23 @@
                 gridRows = this.options.gridRows,
                 bottomRowPos = topRowPos + gridRows;
 
-            if (bottomRowPos ==  this.currentLastRow){
-                return;
+                if (this._wasScrollbarPositionAdjusted) {
+                    this._wasScrollbarPositionAdjusted = false;
+                    return;
+                }
+
+            if (bottomRowPos ==  this.currentLastRow) {
+                if (thumbPosition > this.scrollerThumbPosition) {
+                    topRowPos++;
+                    bottomRowPos++;
+                } else {
+                    topRowPos--;
+                    bottomRowPos--;
+                }
+
+                thumbPosition = topRowPos*rowHeight;
+                thumb.scrollTop = thumbPosition;
+                this._wasScrollbarPositionAdjusted = true;
             }
 
             // If this scroll function gets requested several time the duplicated calls will not go through.
@@ -465,7 +481,7 @@
             }
         }
 
-        this.currentLastRow = cnt;
+        this.currentLastRow = this.currentRowOffset + cnt;
 
         // Make sure that we are populating the scroller height only once and after it was created
         if (this.$scroller.height() < 1)
