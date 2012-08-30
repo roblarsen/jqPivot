@@ -4,7 +4,6 @@
 	border-collapse:collapse;
 	margin:0;
 	padding:0;
-/*	position: relative; */
 }
 
 
@@ -17,6 +16,70 @@
 
 .jqPivotInnerTable th, .jqPivotInnerTable td{
    border-left:0px;
+}
+
+#scroller {
+	width:18px;
+    height:0px;
+    overflow-y:scroll;
+    overflow-x:hidden;
+    position:absolute;
+    right:0px;
+    top:0px;
+    display:none;
+}
+
+#fake {
+	height:0px;
+    width:1px;
+}
+
+#jqPivotScrollingViewportContainer{
+	overflow-y:hidden;
+	overflow-x:hidden;
+	margin:0px;
+	padding:0px;
+	border:0px;                                            	
+}
+
+.jqPivotGrips{
+	 height:0px; 
+	 position:relative;
+}
+
+.jqPivotGrip{
+	margin-left:-2px; 
+	position:absolute; 
+	z-index:5;
+}
+
+.jqPivotGrip .jqPivotColResizer{
+	position:absolute;
+	background-color:transparent;
+	opacity:0;
+	width:10px;
+	height:100%;
+	top:0px
+}
+
+.jqPivotTable, .jqPivotInnerTable {
+	table-layout:fixed;
+
+} 
+.jqPivotTable td, .jqPivotTable th{
+	overflow:hidden;
+	padding-left:0!important; 
+	padding-right:0!important;
+} 
+
+.jqPivotLastGrip{
+	position:absolute; 
+	width:1px;
+} 
+
+.jqPivotGripDrag{ 
+	margin-left:2px; 
+	border-left:1px dotted black;
 }
 
 .grip{

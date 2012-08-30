@@ -31,27 +31,24 @@
 	            grid = $("#grid").jqPivot({
 	                data: historicalData.slice(0, 20),
 	                viewport: new $.jqPivot.jqPivotScrollingViewport(),
-	                gridRows: 10,
+	                gridRows: 3,
 	                columnHeaders: columnHeaders,
 	                liveDrag: true,
 	                toolTipDivID: "myToolTip"
-	                //tooltipOptions: { defaultHtmlContent: "<div class=\"jqPivotTooltip\">This tooltip is showing<br><b>{{_name}}</b>: {{value}}</div>" }
 	            });
-         //$("<div/>").jqPivot.jqPivotPagingViewport(1);
-             grid.jqPivot("maxRowsNumber", maxRowsNumber);
-          //grid.options("viewport", "a");
+            grid.jqPivot("maxRowsNumber", maxRowsNumber);
 	
 	        grid.on("jqpivotrequestdata", bind(this, function (event, data) {
 	            callbackToken = data;
 	            callbackToken.gridData = historicalData.slice(data.from, data.to);
 	            grid.jqPivot("populateData", callbackToken);
-	            
 	        }));
 	    });
 	 </script>
 	 
 	 <div id="myToolTip" class="jqPivotTooltip" style="display:none;">
-	 	InPage ToolTip:<br><b>{{_name}}</b>: {{value}}
+	 	<b>{{_name}}</b>: {{value}}
 	 </div>
+
 </body>
 </html>
