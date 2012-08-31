@@ -289,7 +289,7 @@
         } else {
             this.$scroller.css("display", "block");
             verticalScrollbarSize = this.$scroller[0].offsetWidth - this.$scroller[0].clientWidth;
-            
+
             // Creates the empty column where the scrollbar should overlap with
             // if the scrollabr column wasn't created yet.
             if (scrollbarColumn.length == 0) {
@@ -485,7 +485,7 @@
 
         // Make sure that we are populating the scroller height only once and after it was created
         if (this.$scroller.height() < 1)
-            this.$scroller.height((this.$innerTable.height()-3)+"px");
+            this.$scroller.height(this.$innerTable.height()+"px");
 
         // ToDo: move this code in a shared place for both viewports        
         // if this is the first time that we populate data on the grid
@@ -497,10 +497,13 @@
             // Calculate the columns size
             var columnHeaders = this.$innerTable.find(">thead>tr>th"),
                 columnCount = columnHeaders.length,
-                columnSizes = [];
+                columnSizes = [],
+                $currentColumnHeader;
 
             for (var cnt = 0; cnt < columnCount; cnt++) {
-                columnSizes.push($(columnHeaders[cnt]).width()); // ToDo: don't know why this is not working. Next thing to fix.
+                $currentColumnHeader = $(columnHeaders[cnt]);
+                columnSizes.push($currentColumnHeader.width());
+                $currentColumnHeader.css("width", $currentColumnHeader.width());
                 //columnSizes.push(this.$innerTable.width()/columnCount);
             }
 
@@ -740,7 +743,7 @@
             // Calculate the columns size
             var columnHeaders = this.$innerTable.find(">thead>tr>th"),
                 columnCount = columnHeaders.length,
-                columnSizes = new Array(),
+                columnSizes = [],
                 $currentColumnHeader;
 
             for (var cnt = 0; cnt < columnCount; cnt++) {
