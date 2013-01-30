@@ -3,11 +3,10 @@
  * (c) Rob Larsen, 2012
  */
 
+;(function ( $, window, document, undefined ) {
 // Tells the browser to use ES5 strict mode, if supported
 "use strict";
-
-;(function ( $, window, document, undefined ) {
-    var PIVOT_NAMESPACE = "jqPivot",
+  var PIVOT_NAMESPACE = "jqPivot",
         CONTENT_CONTAINER_INNER_CELL_CLASS = PIVOT_NAMESPACE + "InnerCell",
         DATA_CURRENT_COLUMN_NUMBER = "currColNum",
         DATA_ROW_HEIGHT = "rowHeight",
